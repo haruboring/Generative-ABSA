@@ -35,7 +35,7 @@ python main.py --task $task \
             --gradient_accumulation_steps 2 \
             --eval_batch_size 16 \
             --learning_rate 3e-4 \
-            --num_train_epochs 20 
+            --num_train_epochs 20
 ```
 - `$task` refers to one of the ABSA task in [`aope`, `uabsa`, `aste`, `tasd`] 
 - `$dataset` refers to one of the four datasets in [`laptop14`, `rest14`, `rest15`, `rest6`]
