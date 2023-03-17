@@ -86,7 +86,7 @@ def get_dataset(tokenizer, type_path, args):
 class T5FineTuner(pl.LightningModule):
     def __init__(self, hparams):
         super(T5FineTuner, self).__init__()
-        self.hparams = hparams
+        self.hparams.update(vars(hparams))
 
         self.model = T5ForConditionalGeneration.from_pretrained(hparams.model_name_or_path)
         self.tokenizer = T5Tokenizer.from_pretrained(hparams.model_name_or_path)
