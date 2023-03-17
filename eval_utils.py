@@ -5,17 +5,17 @@ import editdistance
 
 sentiment_word_list = ['positive', 'negative', 'neutral']
 aspect_cate_list = ['location general',
- 'food prices',
- 'food quality',
- 'ambience general',
- 'service general',
- 'restaurant prices',
- 'drinks prices',
- 'restaurant miscellaneous',
- 'drinks quality',
- 'drinks style_options',
- 'restaurant general',
- 'food style_options']
+                    'food prices',
+                    'food quality',
+                    'ambience general',
+                    'service general',
+                    'restaurant prices',
+                    'drinks prices',
+                    'restaurant miscellaneous',
+                    'drinks quality',
+                    'drinks style_options',
+                    'restaurant general',
+                    'food style_options']
 
 
 def extract_spans_extraction(task, seq):
@@ -40,7 +40,7 @@ def extract_spans_extraction(task, seq):
                     a, b, c = pt.split(', ')
                 except ValueError:
                     a, b, c = '', '', ''
-                extractions.append((a, b, c))            
+                extractions.append((a, b, c))
         return extractions
 
 
@@ -58,18 +58,18 @@ def extract_pairs(seq):
     aps = [ap[1:-1] for ap in aps]
     pairs = []
     for ap in aps:
-        # the original sentence might have 
+        # the original sentence might have
         try:
             at, ots = ap.split('|')
         except ValueError:
             at, ots  = '', ''
-        
-        if ',' in ots:     # multiple ots 
+
+        if ',' in ots:     # multiple ots
             for ot in ots.split(', '):
                 pairs.append((at, ot))
         else:
-            pairs.append((at, ots))    
-    return pairs        
+            pairs.append((at, ots))
+    return pairs
 
 
 def extract_triplets(seq):
@@ -81,7 +81,7 @@ def extract_triplets(seq):
             a, b, c = ap.split('|')
         except ValueError:
             a, b, c = '', '', ''
-        
+
         # for ASTE
         if b in sentiment_word_list:
             if ',' in c:
@@ -152,7 +152,7 @@ def fix_preds_aope(all_pairs, sents):
             all_new_pairs.append(pairs)
         else:
             for pair in pairs:
-                #print(pair)
+                # print(pair)
                 # AT not in the original sentence
                 if pair[0] not in  ' '.join(sents[i]):
                     # print('Issue')
@@ -208,12 +208,12 @@ def fix_preds_aste(all_pairs, sents):
                     new_at = recover_terms_with_editdistance(at, sents[i])
                 else:
                     new_at = at
-                
+
                 if ac not in sentiment_word_list:
                     new_sentiment = recover_terms_with_editdistance(ac, sentiment_word_list)
                 else:
                     new_sentiment = ac
-                
+
                 # OT not in the original sentence
                 ots = ott.split(', ')
                 new_ot_list = []
@@ -231,7 +231,7 @@ def fix_preds_aste(all_pairs, sents):
                 # print(pair, '>>>>>', word_and_sentiment)
                 # print(all_target_pairs[i])
             all_new_pairs.append(new_pairs)
-    
+
     return all_new_pairs
 
 
@@ -245,7 +245,7 @@ def fix_preds_tasd(all_pairs, sents):
             all_new_pairs.append(pairs)
         else:
             for pair in pairs:
-                #print(pair)
+                # print(pair)
                 # AT not in the original sentence
                 sents_and_null = ' '.join(sents[i]) + 'NULL'
                 if pair[0] not in  sents_and_null:
@@ -253,7 +253,7 @@ def fix_preds_tasd(all_pairs, sents):
                     new_at = recover_terms_with_editdistance(pair[0], sents[i])
                 else:
                     new_at = pair[0]
-                
+
                 # AC not in the list
                 acs = pair[1].split(', ')
                 new_ac_list = []
@@ -263,17 +263,17 @@ def fix_preds_tasd(all_pairs, sents):
                     else:
                         new_ac_list.append(ac)
                 new_ac = ', '.join(new_ac_list)
-                
+
                 if pair[2] not in sentiment_word_list:
                     new_sentiment = recover_terms_with_editdistance(pair[2], sentiment_word_list)
                 else:
                     new_sentiment = pair[2]
-            
+
                 new_pairs.append((new_at, new_ac, new_sentiment))
                 # print(pair, '>>>>>', word_and_sentiment)
                 # print(all_target_pairs[i])
             all_new_pairs.append(new_pairs)
-    
+
     return all_new_pairs
 
 
@@ -281,11 +281,11 @@ def fix_pred_with_editdistance(all_predictions, sents, task):
     if task == 'uabsa':
         fixed_preds = fix_preds_uabsa(all_predictions, sents)
     elif task == 'aope':
-        fixed_preds = fix_preds_aope(all_predictions, sents) 
-    elif task == 'aste': 
-        fixed_preds = fix_preds_aste(all_predictions, sents) 
+        fixed_preds = fix_preds_aope(all_predictions, sents)
+    elif task == 'aste':
+        fixed_preds = fix_preds_aste(all_predictions, sents)
     elif task == 'tasd':
-        fixed_preds = fix_preds_tasd(all_predictions, sents) 
+        fixed_preds = fix_preds_tasd(all_predictions, sents)
     else:
         print("*** Unimplemented Error ***")
         fixed_preds = all_predictions
@@ -321,7 +321,7 @@ def compute_scores(pred_seqs, gold_seqs, sents, io_format, task):
     """
     compute metrics for multiple tasks
     """
-    assert len(pred_seqs) == len(gold_seqs) 
+    assert len(pred_seqs) == len(gold_seqs)
     num_samples = len(gold_seqs)
 
     all_labels, all_predictions = [], []
@@ -336,7 +336,7 @@ def compute_scores(pred_seqs, gold_seqs, sents, io_format, task):
 
         all_labels.append(gold_list)
         all_predictions.append(pred_list)
-    
+
     print("\nResults of raw output")
     raw_scores = compute_f1_scores(all_predictions, all_labels)
     print(raw_scores)
@@ -346,5 +346,5 @@ def compute_scores(pred_seqs, gold_seqs, sents, io_format, task):
     print("\nResults of fixed output")
     fixed_scores = compute_f1_scores(all_predictions_fixed, all_labels)
     print(fixed_scores)
-    
+
     return raw_scores, fixed_scores, all_labels, all_predictions, all_predictions_fixed

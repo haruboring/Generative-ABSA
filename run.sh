@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-python main.py --task uabsa \
+python3 main.py --task uabsa \
             --dataset laptop14 \
             --model_name_or_path ./pretrained-models/t5-base \
             --paradigm annotation \
