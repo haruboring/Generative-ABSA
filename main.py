@@ -34,7 +34,7 @@ def init_args():
                         help="The way to construct target sentence, selected from: [annotation, extraction]")
     parser.add_argument("--do_train", action='store_true', help="Whether to run training.")
     parser.add_argument("--do_eval", action='store_true', help="Whether to run eval on the dev/test set.")
-    parser.add_argument("--do_direct_eval", action='store_true', 
+    parser.add_argument("--do_direct_eval", action='store_true',
                         help="Whether to run direct eval on the dev/test set.")
 
     # Other parameters
@@ -47,7 +47,7 @@ def init_args():
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
     parser.add_argument("--learning_rate", default=3e-4, type=float)
-    parser.add_argument("--num_train_epochs", default=20, type=int, 
+    parser.add_argument("--num_train_epochs", default=20, type=int,
                         help="Total number of training epochs to perform.")
     parser.add_argument('--seed', type=int, default=42, help="random seed for initialization")
 
@@ -79,8 +79,8 @@ def init_args():
 
 
 def get_dataset(tokenizer, type_path, args):
-    return ABSADataset(tokenizer=tokenizer, data_dir=args.dataset, data_type=type_path, 
-                       paradigm=args.paradigm, task=args.task, max_len=args.max_seq_length)
+    return ABSADataset(tokenizer=tokenizer, data_dir=args.dataset, data_type=type_path,
+                        paradigm=args.paradigm, task=args.task, max_len=args.max_seq_length)
 
 
 class T5FineTuner(pl.LightningModule):
@@ -94,15 +94,15 @@ class T5FineTuner(pl.LightningModule):
     def is_logger(self):
         return True
 
-    def forward(self, input_ids, attention_mask=None, decoder_input_ids=None, 
+    def forward(self, input_ids, attention_mask=None, decoder_input_ids=None,
                 decoder_attention_mask=None, labels=None):
         return self.model(
-            input_ids,
-            attention_mask=attention_mask,
-            decoder_input_ids=decoder_input_ids,
-            decoder_attention_mask=decoder_attention_mask,
-            labels=labels,
-        )
+                input_ids,
+                attention_mask=attention_mask,
+                decoder_input_ids=decoder_input_ids,
+                decoder_attention_mask=decoder_attention_mask,
+                labels=labels,
+            )
 
     def _step(self, batch):
         lm_labels = batch["target_ids"]
@@ -328,7 +328,7 @@ if args.do_eval:
             model_ckpt = torch.load(checkpoint)
             model = T5FineTuner(model_ckpt['hyper_parameters'])
             model.load_state_dict(model_ckpt['state_dict'])
-            
+
             dev_result = evaluate(dev_loader, model, args.paradigm, args.task)
             if dev_result['f1'] > best_f1:
                 best_f1 = dev_result['f1']
@@ -377,7 +377,7 @@ if args.do_direct_eval:
     sents, _ = read_line_examples_from_file(f'data/{args.task}/{args.dataset}/test.txt')
 
     print()
-    test_dataset = ABSADataset(tokenizer, data_dir=args.dataset, data_type='test', 
+    test_dataset = ABSADataset(tokenizer, data_dir=args.dataset, data_type='test',
                     paradigm=args.paradigm, task=args.task, max_len=args.max_seq_length)
     test_loader = DataLoader(test_dataset, batch_size=32, num_workers=4)
     # print(test_loader.device)
